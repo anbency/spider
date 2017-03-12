@@ -1,4 +1,6 @@
 #-*-coding=utf-8-*-
+
+
 import sqlite3
 import urllib2
 import random
@@ -6,14 +8,16 @@ from bs4 import BeautifulSoup
 import re
 import os
 import shutil
-
+import chardet
 '''
 import urllib2
 import proxy
-i = 6
+from bs4 import BeautifulSoup
+i = 9
 webpage = proxy.getWebpage("http://helloyesyes.iteye.com/blog/search?page=" + str(i) + "&query=kernel",i)
 webpage.getPageContent()
 webpage.parseHTML(open("text"+ str(i) + (".html")))
+
 '''
 class getWebpage():
 
@@ -28,11 +32,15 @@ class getWebpage():
 
         targeturl = "http://helloyesyes.iteye.com"
         targetlist = []
-        
+        #print soup.find_all(href = re.compile("\/blog\/[0-9]+$"))
         for x in soup.find_all(href = re.compile("\/blog\/[0-9]+$")):
-            print x.string + x.get('href')
+            #s = x.encode('utf-8')
+            print x.string; print x.get('href')
+            #print chardet.detect(x.string)
+            #print chardet.detect(x.get('href'))
             targetlist.append([x.string, targeturl + x.get('href')])
-        #print targetlist
+            #targetlist.append(s)
+        print targetlist
 
         if os.path.exists('output'):
             shutil.rmtree('output')
@@ -53,7 +61,7 @@ class getWebpage():
             html = resp.read()
              
             self.saveHtml("output//",x[0],html)
-            
+
 
     def getPageContent(self):
 	#proxy = create_proxy()
@@ -73,18 +81,15 @@ class getWebpage():
             
         except :
             print "Not work"
-        resp.encoding='gbk' 
+         
         html = resp.read()
-           
-        #print html
-        filename = "text" + self.page
-        self.saveHtml("", filename,html) 
-        #self.parseHTML(html)
 
-    def saveHtml(self,path, file_name,file_content):    
-        #    注意windows文件命名的禁用符，比如 /    
-        with open (path + file_name.replace('/','_')+".html","wb") as f:  
-            #   写文件用bytes而不是str，所以要转码    
+        filename = "text" + self.page
+        #self.saveHtml("", filename,html) 
+        self.parseHTML(html)
+
+    def saveHtml(self,path, file_name,file_content):  
+        with open (path + file_name +".html","wb") as f:  
             f.write( file_content ) 
 
 def create_proxy():
@@ -116,10 +121,10 @@ def create_proxy():
     #dream_url = http://helloyesyes.iteye.com/blog/search?page=2&query=kernel
 
 if __name__ == "__main__":
-    for i in range(1,2):
+    for i in range(9,10):
     	dream_url = "http://helloyesyes.iteye.com/blog/search?page="+ str(i) + "&query=kernel"
 	print dream_url
     	webpage = getWebpage(dream_url,i)
         webpage.getPageContent()
-        #webpage.parseHTML("text1.html")
+        #webpage.parseHTML(open("text9.html").read())
     
